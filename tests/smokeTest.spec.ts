@@ -103,7 +103,6 @@ test('Create, Update and Delete Article', async ({ api }) => {
         .postRequest(201)
     expect(createArticleResponse.article.title).toEqual('New Test');
     const slugId = createArticleResponse.article.slug;
-    console.log(slugId);
 
     // GET -  Assertion
     const articlesResponse = await api
@@ -123,7 +122,6 @@ test('Create, Update and Delete Article', async ({ api }) => {
         .putRequest(200)
     expect(updateArticleResponse.article.title).toEqual('New Test 2');
     const slugId2 = updateArticleResponse.article.slug;
-    console.log(slugId2);
 
     // DELETE the Article
     const deleteResponse = await api

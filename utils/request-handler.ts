@@ -1,9 +1,10 @@
 import { APIRequestContext, expect } from "@playwright/test";
-import { resolve } from "path";
+import { APILogger } from "./logger";
 
 export class RequestHandler {
 
     private request!: APIRequestContext;
+    private logger!: APILogger;
     private baseUrl!: string;
     private defaultBaseURL: string;
     private apiPath: string = '';
@@ -11,9 +12,10 @@ export class RequestHandler {
     private apiHeaders: Record<string, string> = {};
     private apiBody: object = {};
 
-    constructor(request: APIRequestContext, apiBaseUrl: string) {
+    constructor(request: APIRequestContext, apiBaseUrl: string, logger: APILogger) {
         this.request = request;
         this.defaultBaseURL = apiBaseUrl;
+        this.logger = logger;
     }
 
     url(url: string) {
@@ -47,15 +49,17 @@ export class RequestHandler {
      * @param status (expected status code)
      * @returns responseJSON
      */
-    async getRequest(status: number) {
+    async getRequest(statusCode: number) {
         const url = this.getUrl();
+        this.logger.logRequest('GET', url, this.apiHeaders)
         const response = await this.request.get(url, {
             headers: this.apiHeaders,
         });
-
-        // Assertion
-        expect(response.status()).toEqual(status);
+        const actualStatus = response.status();
         const responseJSON = await response.json();
+        this.logger.logResponse(actualStatus, responseJSON);
+        this.statusCodeValidator(actualStatus, statusCode, this.getRequest);
+        
         return responseJSON;
     }
 
@@ -65,16 +69,18 @@ export class RequestHandler {
      * @param status (expected status code)
      * @returns responseJSON
      */
-    async postRequest(status: number){
+    async postRequest(statusCode: number){
         const url = this.getUrl();
+        this.logger.logRequest('POST', url, this.apiHeaders, this.apiBody)
         const response = await this.request.post(url, {
             headers: this.apiHeaders,
             data: this.apiBody
         });
-
-        // Assertion
-        expect(response.status()).toEqual(status);
+        const actualStatus = response.status();
         const responseJSON = await response.json();
+        this.logger.logResponse(actualStatus, responseJSON);
+        this.statusCodeValidator(actualStatus, statusCode, this.postRequest);
+        
         return responseJSON;
     }
     
@@ -84,16 +90,18 @@ export class RequestHandler {
      * @param status (expected status code)
      * @returns responseJSON
      */
-    async putRequest(status: number){
+    async putRequest(statusCode: number){
         const url = this.getUrl();
+        this.logger.logRequest('PUT', url, this.apiHeaders, this.apiBody)
         const response = await this.request.put(url, {
             headers: this.apiHeaders,
             data: this.apiBody
         });
-
-        // Assertion
-        expect(response.status()).toEqual(status);
+        const actualStatus = response.status();
         const responseJSON = await response.json();
+        this.logger.logResponse(actualStatus, responseJSON);
+        this.statusCodeValidator(actualStatus, statusCode, this.putRequest);
+
         return responseJSON;
     }
 
@@ -102,12 +110,15 @@ export class RequestHandler {
      * This function performs DELETE HTTP method.
      * @param status (expected status code)
      */
-    async deleteRequest(status: number) {
+    async deleteRequest(statusCode: number) {
         const url = this.getUrl();
+        this.logger.logRequest('DELETE', url, this.apiHeaders)
         const response = await this.request.delete(url, {
             headers: this.apiHeaders,
         });
-        expect(response.status()).toEqual(status);
+        const actualStatus = response.status();
+        this.logger.logResponse(actualStatus);
+        this.statusCodeValidator(actualStatus, statusCode, this.deleteRequest);
     }
 
     /**
@@ -126,5 +137,14 @@ export class RequestHandler {
 
     delay(ms: number ){
         return new Promise( resolve => setTimeout(resolve, ms));
+    }
+
+    private statusCodeValidator(actualStatus: number, expectedStatus: number, callingMethod: Function){
+        if(actualStatus !== expectedStatus){
+            const logs = this.logger.getRecentLogs();
+            const error = new Error(`Expected status code ${expectedStatus} but got ${actualStatus}\n\nRecent API activity: \n${logs}`);
+            Error.captureStackTrace(error, callingMethod);
+            throw error;
+        }
     }
 }
