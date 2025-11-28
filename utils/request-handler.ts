@@ -1,4 +1,5 @@
 import { APIRequestContext, expect } from "@playwright/test";
+import { resolve } from "path";
 
 export class RequestHandler {
 
@@ -41,8 +42,10 @@ export class RequestHandler {
     }
 
     /** 
-     * This function sends an API request to the endpoint and returns a response in JSON format.
-     * @returns ${responseJSON}
+     * GET -
+     * This function sends an API request to the endpoint and returns a JSON format response.
+     * @param status (expected status code)
+     * @returns responseJSON
      */
     async getRequest(status: number) {
         const url = this.getUrl();
@@ -57,6 +60,57 @@ export class RequestHandler {
     }
 
     /**
+     * POST -
+     * This functions performs a POST request and returns a JSON format response.
+     * @param status (expected status code)
+     * @returns responseJSON
+     */
+    async postRequest(status: number){
+        const url = this.getUrl();
+        const response = await this.request.post(url, {
+            headers: this.apiHeaders,
+            data: this.apiBody
+        });
+
+        // Assertion
+        expect(response.status()).toEqual(status);
+        const responseJSON = await response.json();
+        return responseJSON;
+    }
+    
+    /**
+     * PUT -
+     * This functions performs a PUT request and returns a JSON format response.
+     * @param status (expected status code)
+     * @returns responseJSON
+     */
+    async putRequest(status: number){
+        const url = this.getUrl();
+        const response = await this.request.put(url, {
+            headers: this.apiHeaders,
+            data: this.apiBody
+        });
+
+        // Assertion
+        expect(response.status()).toEqual(status);
+        const responseJSON = await response.json();
+        return responseJSON;
+    }
+
+    /** 
+     * DELETE -
+     * This function performs DELETE HTTP method.
+     * @param status (expected status code)
+     */
+    async deleteRequest(status: number) {
+        const url = this.getUrl();
+        const response = await this.request.delete(url, {
+            headers: this.apiHeaders,
+        });
+        expect(response.status()).toEqual(status);
+    }
+
+    /**
      * This functions builds the URL with params (if needed) and return the final URL as string object
      * @returns url (string)
      */
@@ -68,5 +122,9 @@ export class RequestHandler {
             url.searchParams.append(key, value);
         }
         return url.toString();
+    }
+
+    delay(ms: number ){
+        return new Promise( resolve => setTimeout(resolve, ms));
     }
 }
