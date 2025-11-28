@@ -1,6 +1,6 @@
 import { test } from '../utils/fixtures';
 
-test('first test', async ({ api }) => {
+test('Get Articles', async ({ api }) => {
     const response = await api
         .path('/articles')
         .params({ limit: 2, offset: 0 })
