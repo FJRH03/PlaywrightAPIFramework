@@ -3,8 +3,8 @@ import { expect } from '../utils/custom-expect';
 
 let authToken: string;
 
-test.beforeAll('run before all', async ({ api }) => {
-    const payload = { "user": { "email": "franktest@test.com", "password": "Test1234" } };
+test.beforeAll('run before all', async ({ api, config }) => {
+    const payload = { "user": { "email": config.userEmail, "password": config.userPassword } };
     const tokenResponse = await api
         .path('/users/login')
         .body(payload)
