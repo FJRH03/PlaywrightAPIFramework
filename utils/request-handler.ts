@@ -59,7 +59,7 @@ export class RequestHandler {
         const responseJSON = await response.json();
         this.logger.logResponse(actualStatus, responseJSON);
         this.statusCodeValidator(actualStatus, statusCode, this.getRequest);
-        
+
         return responseJSON;
     }
 
@@ -69,7 +69,7 @@ export class RequestHandler {
      * @param status (expected status code)
      * @returns responseJSON
      */
-    async postRequest(statusCode: number){
+    async postRequest(statusCode: number) {
         const url = this.getUrl();
         this.logger.logRequest('POST', url, this.apiHeaders, this.apiBody)
         const response = await this.request.post(url, {
@@ -77,20 +77,20 @@ export class RequestHandler {
             data: this.apiBody
         });
         const actualStatus = response.status();
-        const responseJSON = await response.json();
+        const responseJSON = response.json();
         this.logger.logResponse(actualStatus, responseJSON);
         this.statusCodeValidator(actualStatus, statusCode, this.postRequest);
-        
+
         return responseJSON;
     }
-    
+
     /**
      * PUT -
      * This functions performs a PUT request and returns a JSON format response.
      * @param status (expected status code)
      * @returns responseJSON
      */
-    async putRequest(statusCode: number){
+    async putRequest(statusCode: number) {
         const url = this.getUrl();
         this.logger.logRequest('PUT', url, this.apiHeaders, this.apiBody)
         const response = await this.request.put(url, {
@@ -135,12 +135,12 @@ export class RequestHandler {
         return url.toString();
     }
 
-    delay(ms: number ){
-        return new Promise( resolve => setTimeout(resolve, ms));
+    delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    private statusCodeValidator(actualStatus: number, expectedStatus: number, callingMethod: Function){
-        if(actualStatus !== expectedStatus){
+    private statusCodeValidator(actualStatus: number, expectedStatus: number, callingMethod: Function) {
+        if (actualStatus !== expectedStatus) {
             const logs = this.logger.getRecentLogs();
             const error = new Error(`Expected status code ${expectedStatus} but got ${actualStatus}\n\nRecent API activity: \n${logs}`);
             Error.captureStackTrace(error, callingMethod);
