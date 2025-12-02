@@ -14,6 +14,7 @@ test('Get Articles', async ({ api }) => {
         .path('/articles')
         .params({ limit: 2, offset: 0 })
         .getRequest(200);
+    await expect(response).shouldMatchSchema('articles', 'GET_articles', true);
     expect(response.articlesCount).shouldEqual(10);
     expect(response.articlesCount).shouldBeLessThanOrEqual(10);
 });
