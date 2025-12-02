@@ -12,8 +12,8 @@ export async function validateSchema(dirName: string, fileName: string, response
     if (createSchema) {
         try {
             const generatedSchema = createSchema(responseBody);
-            fs.mkdir(path.dirname(schemaPath), { recursive: true });
-            fs.writeFile(schemaPath, JSON.stringify(generatedSchema, null, 4))
+            await fs.mkdir(path.dirname(schemaPath), { recursive: true });
+            await fs.writeFile(schemaPath, JSON.stringify(generatedSchema, null, 4))
         } catch (error:any) {
             throw new Error(`Failed to create schema file ${error.message}`);
         }
