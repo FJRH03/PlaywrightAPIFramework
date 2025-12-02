@@ -14,7 +14,8 @@ test('Get Articles', async ({ api }) => {
         .path('/articles')
         .params({ limit: 2, offset: 0 })
         .getRequest(200);
-    await expect(response).shouldMatchSchema('articles', 'GET_articles', true);
+
+    await expect(response).shouldMatchSchema('articles', 'GET_articles');
     expect(response.articlesCount).shouldEqual(10);
     expect(response.articlesCount).shouldBeLessThanOrEqual(10);
 });
@@ -47,6 +48,10 @@ test('Create and delete Article', async ({ api }) => {
         .headers({ Authorization: authToken })
         .body(articlePayload)
         .postRequest(201)
+
+    // Validate Schema   
+    await expect(createArticleResponse).shouldMatchSchema('articles', 'POST_article');  
+    
     expect(createArticleResponse.article.title).shouldEqual('New Test');
     const slugId = createArticleResponse.article.slug;
 
@@ -56,7 +61,6 @@ test('Create and delete Article', async ({ api }) => {
         .headers({ Authorization: authToken })
         .params({ limit: 2, offset: 0 })
         .getRequest(200);
-
     const articleTitle = articlesResponse.articles[0].title;
     expect(articleTitle).shouldEqual('New Test');
 
@@ -65,7 +69,6 @@ test('Create and delete Article', async ({ api }) => {
         .path(`/articles/${slugId}`)
         .headers({ Authorization: authToken })
         .deleteRequest(204);
-
     // Validate deletion successfully
     const articlesResponse2 = await api
         .path('/articles')
