@@ -1,4 +1,4 @@
-import { APIRequestContext, expect } from "@playwright/test";
+import { APIRequestContext } from "@playwright/test";
 import { APILogger } from "./logger";
 
 export class RequestHandler {

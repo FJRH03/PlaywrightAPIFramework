@@ -1,3 +1,4 @@
+// THIS FILE CONTAINS ENVIRONMENT CONFIG AND VALUES
 const processENV = process.env.TEST_ENV;
 const env = processENV || 'dev';
 console.log(`TEST ENVIRONMENT: ${env}`);

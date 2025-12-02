@@ -1,7 +1,7 @@
 export class APILogger {
     private recentLogs: any[] = [];
 
-    // body? means optional
+    // body? means that is optional
     logRequest(method: string, url: string, headers: Record<string, string>, body?: any) {
         const logEntry = { method, url, headers, body };
         this.recentLogs.push({ type: 'Request Details', data: logEntry });
