@@ -7,17 +7,10 @@ const SCHEMA_BASE_PATH = './response-schemas';
 const ajv = new Ajv({ allErrors: true });
 
 export async function validateSchema(dirName: string, fileName: string, responseBody: object, createSchemaFlag: boolean = false) {
+
     const schemaPath = path.join(SCHEMA_BASE_PATH, dirName, `${fileName}_schema.json`);
 
-    if (createSchema) {
-        try {
-            const generatedSchema = createSchema(responseBody);
-            await fs.mkdir(path.dirname(schemaPath), { recursive: true });
-            await fs.writeFile(schemaPath, JSON.stringify(generatedSchema, null, 4))
-        } catch (error:any) {
-            throw new Error(`Failed to create schema file ${error.message}`);
-        }
-    }
+    if (createSchemaFlag) await generateNewSchema(responseBody, schemaPath);
 
     const schema = await loadSchema(schemaPath);
     const validate = ajv.compile(schema);
@@ -32,11 +25,23 @@ export async function validateSchema(dirName: string, fileName: string, response
     }
 }
 
+
 async function loadSchema(schemaPath: string) {
     try {
         const schemaContent = await fs.readFile(schemaPath, 'utf-8');
         return JSON.parse(schemaContent);
     } catch (error) {
         throw new Error(`Failed to the read the schema file: ${error}`);
+    }
+}
+
+
+async function generateNewSchema(responseBody: object, schemaPath: string) {
+    try {
+        const generatedSchema = createSchema(responseBody);
+        await fs.mkdir(path.dirname(schemaPath), { recursive: true });
+        await fs.writeFile(schemaPath, JSON.stringify(generatedSchema, null, 4))
+    } catch (error: any) {
+        throw new Error(`Failed to create schema file ${error.message}`);
     }
 }
