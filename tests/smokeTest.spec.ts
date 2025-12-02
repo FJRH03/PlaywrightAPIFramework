@@ -1,6 +1,7 @@
 import { test } from '../utils/fixtures';
 import { expect } from '../utils/custom-expect';
 import { createToken } from '../helpers/createToken';
+import { validateSchema } from '../utils/schema-validator';
 
 let authToken: string;
 
@@ -22,6 +23,7 @@ test('Test Get Tags', async ({ api }) => {
     const response = await api
         .path('/tags')
         .getRequest(200);
+    await validateSchema('tags', 'GET_tags', response);
 });
 
 test('Create and delete Article', async ({ api }) => {
