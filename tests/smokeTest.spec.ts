@@ -25,7 +25,7 @@ test('Test Get Tags', async ({ api }) => {
         .getRequest(200);
         
     // Validate Schema   
-    expect(response).shouldMatchSchema('tags', 'GET_tags');     
+    await expect(response).shouldMatchSchema('tags', 'GET_tags', true);     
 });
 
 test('Create and delete Article', async ({ api }) => {
