@@ -1,6 +1,7 @@
 import { test } from '../utils/fixtures';
 import { expect } from '../utils/custom-expect';
 import { createToken } from '../helpers/createToken';
+import articleRequestPayload from '../request-objects/POST-article.json';
 
 let authToken: string;
 
@@ -34,22 +35,11 @@ test('Get Articles', async ({ api }) => {
 
 
 test('Create and delete Article', async ({ api }) => {
-    // Create article body payload.
-    const articlePayload = {
-        "article":
-        {
-            "title": "New Test",
-            "description": "This is a Frank Test",
-            "body": "This is a description for frank test",
-            "tagList": []
-        }
-    };
-
     // POST - Create Article
     const createArticleResponse = await api
         .path('/articles')
         .headers({ Authorization: authToken })
-        .body(articlePayload)
+        .body(articleRequestPayload)
         .postRequest(201)
 
     // Validate Schema   
@@ -58,7 +48,7 @@ test('Create and delete Article', async ({ api }) => {
     expect(createArticleResponse.article.title).shouldEqual('New Test');
     const slugId = createArticleResponse.article.slug;
 
-    // Assertion
+    // GET - Assertion
     const articlesResponse = await api
         .path('/articles')
         .headers({ Authorization: authToken })
@@ -86,33 +76,11 @@ test('Create and delete Article', async ({ api }) => {
 
 
 test('Create, Update and Delete Article', async ({ api }) => {
-    // Create article body payload.
-    const articlePayload = {
-        "article":
-        {
-            "title": "New Test",
-            "description": "This is a Frank Test",
-            "body": "This is a description for frank test",
-            "tagList": []
-        }
-    };
-
-    // Create body payload to update article.
-    const articlePayload2 = {
-        "article":
-        {
-            "title": "New Test 2",
-            "description": "This is a Frank Test 2",
-            "body": "This is a description for frank test 2",
-            "tagList": []
-        }
-    };
-
     // POST - Create Article
     const createArticleResponse = await api
         .path('/articles')
         .headers({ Authorization: authToken })
-        .body(articlePayload)
+        .body(articleRequestPayload)
         .postRequest(201)
 
     expect(createArticleResponse.article.title).shouldEqual('New Test');
@@ -128,17 +96,20 @@ test('Create, Update and Delete Article', async ({ api }) => {
     const articleTitle = articlesResponse.articles[0].title;
     expect(articleTitle).shouldEqual('New Test');
 
+     // Modify payload property to update existing article.
+    articleRequestPayload.article.title = 'New Test 2';
+
     // PUT - Update Article
     const updateArticleResponse = await api
         .path(`/articles/${slugId}`)
         .headers({ Authorization: authToken })
-        .body(articlePayload2)
+        .body(articleRequestPayload)
         .putRequest(200)
 
     expect(updateArticleResponse.article.title).shouldEqual('New Test 2');
     const slugId2 = updateArticleResponse.article.slug;
 
-    // DELETE the Article
+    // DELETE - the Article
     const deleteResponse = await api
         .path(`/articles/${slugId2}`)
         .headers({ Authorization: authToken })
