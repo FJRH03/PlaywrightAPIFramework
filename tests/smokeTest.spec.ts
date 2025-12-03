@@ -1,7 +1,6 @@
 import { test } from '../utils/fixtures';
 import { expect } from '../utils/custom-expect';
 import { createToken } from '../helpers/createToken';
-import { validateSchema } from '../utils/schema-validator';
 
 let authToken: string;
 
