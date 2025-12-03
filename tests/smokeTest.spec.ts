@@ -8,6 +8,7 @@ test.beforeAll('run before all', async ({ api, config }) => {
     authToken = await createToken(config.userEmail, config.userPassword);
 });
 
+
 test('Test Get Tags', async ({ api }) => {
     const response = await api
         .path('/tags')
@@ -16,6 +17,7 @@ test('Test Get Tags', async ({ api }) => {
     // Validate Schema   
     await expect(response).shouldMatchSchema('tags', 'GET_tags', true);     
 });
+
 
 test('Get Articles', async ({ api }) => {
     const response = await api
@@ -29,6 +31,7 @@ test('Get Articles', async ({ api }) => {
     expect(response.articlesCount).shouldEqual(10);
     expect(response.articlesCount).shouldBeLessThanOrEqual(10);
 });
+
 
 test('Create and delete Article', async ({ api }) => {
     // Create article body payload.
@@ -80,6 +83,7 @@ test('Create and delete Article', async ({ api }) => {
 
     expect(articlesResponse2).not.shouldEqual('New Test');
 });
+
 
 test('Create, Update and Delete Article', async ({ api }) => {
     // Create article body payload.
