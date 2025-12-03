@@ -3,7 +3,7 @@ import { expect } from '../utils/custom-expect';
 import { createToken } from '../helpers/createToken';
 import articleRequestPayload from '../request-objects/POST-article.json';
 import { faker } from '@faker-js/faker';
-
+import { getNewRandomArticle } from '../utils/data-generator';
 
 let authToken: string;
 
@@ -136,4 +136,48 @@ test('Create, Update and Delete Article', async ({ api }) => {
         .getRequest(200);
 
     expect(articlesResponse2).not.shouldEqual(updatedArticleTitle);
+});
+
+
+test('Create and delete Article with Faker Library', async ({ api }) => {
+    // Generate a new random request payload with the faker implementation.
+    const newArticleTitle = getNewRandomArticle();
+
+    // POST - Create Article
+    const createArticleResponse = await api
+        .path('/articles')
+        .headers({ Authorization: authToken })
+        .body(newArticleTitle)
+        .postRequest(201)
+
+    // Validate Schema   
+    await expect(createArticleResponse).shouldMatchSchema('articles', 'POST_article', true);
+
+    expect(createArticleResponse.article.title).shouldEqual(newArticleTitle.article.title);
+    const slugId = createArticleResponse.article.slug;
+
+    // GET - Assertion
+    const articlesResponse = await api
+        .path('/articles')
+        .headers({ Authorization: authToken })
+        .params({ limit: 2, offset: 0 })
+        .getRequest(200);
+
+    const articleTitle = articlesResponse.articles[0].title;
+    expect(articleTitle).shouldEqual(newArticleTitle.article.title);
+
+    // DELETE the Article
+    const deleteResponse = await api
+        .path(`/articles/${slugId}`)
+        .headers({ Authorization: authToken })
+        .deleteRequest(204);
+
+    // Validate deletion successfully
+    const articlesResponse2 = await api
+        .path('/articles')
+        .headers({ Authorization: authToken })
+        .params({ limit: 2, offset: 0 })
+        .getRequest(200);
+
+    expect(articlesResponse2).not.shouldEqual(newArticleTitle.article.title);
 });
