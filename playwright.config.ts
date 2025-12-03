@@ -13,13 +13,23 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [['html'], ['list']],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {},
+  use: {
+    baseURL: 'https://conduit.bondaracademy.com/'
+  },
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'api-test'
+      name: 'api-test',
+      testDir: './tests/api-tests'
     },
+    {
+      name: 'ui-test',
+      testDir: './tests/ui-tests',
+      use: {
+        defaultBrowserType: 'chromium'
+      }
+    }
     // Dependency example
     // {
     //   name: 'smoke-test',
